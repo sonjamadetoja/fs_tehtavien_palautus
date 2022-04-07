@@ -15,12 +15,26 @@ const Statistics = ({good, bad, neutral}) => {
   if (good+neutral+bad > 0) {
     return (
       <div>
-        <StatisticLine text='good' value={good} />
-        <StatisticLine text='neutral' value={neutral} />
-        <StatisticLine text='bad' value={bad} />
-        <StatisticLine text='all' value={good+neutral+bad} />
-        <StatisticLine text='average' value={(good-bad)/good+neutral+bad} />
-        <StatisticLine text='positive' value={good/(good+neutral+bad)} />
+        <table>
+          <tr>
+            <td><StatisticLine text='good' value={good} /></td>
+          </tr>
+          <tr>
+            <td><StatisticLine text='neutral' value={neutral} /></td>
+          </tr>
+          <tr>
+            <td><StatisticLine text='bad' value={bad} /></td>
+          </tr>
+          <tr>
+            <td><StatisticLine text='all' value={good+neutral+bad} /></td>
+          </tr>
+          <tr>
+            <td><StatisticLine text='average' value={(good-bad)/good+neutral+bad} /></td>
+          </tr>
+          <tr>
+            <td><StatisticLine text='positive' value={good/(good+neutral+bad)} /></td>
+          </tr>
+        </table>
       </div>
     )
   }
