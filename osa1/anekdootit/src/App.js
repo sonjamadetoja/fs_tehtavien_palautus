@@ -2,9 +2,9 @@ import { useState } from 'react'
 
 const Button = ({handleClick, text}) => {
   return (
-    <Button onClick={handleClick}>
+    <button onClick={handleClick}>
     {text}
-    </Button>
+    </button>
   )
 }
 
@@ -20,16 +20,16 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
-  const len = anecdotes.length
-  const generate_value = () => Math.floor(Math.random())*len
-  const setToSelected = (props) => setSelected(props)
+  const setToSelected = (props) => {
+    setSelected(props)
+  }
 
   return (
     <div>
       <p>
       {anecdotes[selected]}
       </p>
-      <Button text="next anecdote" handleClick={() => setToSelected(generate_value)} />
+      <Button handleClick={() => setToSelected(() => Math.floor(Math.random() * anecdotes.length))} text="next anecdote"/>
     </div>
   )
 }
