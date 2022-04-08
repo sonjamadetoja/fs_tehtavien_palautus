@@ -22,7 +22,7 @@ const App = () => {
   const [selected, setSelected] = useState(0)
   const len = anecdotes.length
   const generate_value = () => Math.floor(Math.random())*len
-  const setToSelected = ({newValue}) => setSelected({newValue})
+  const setToSelected = (props) => setSelected(props)
 
   return (
     <div>
