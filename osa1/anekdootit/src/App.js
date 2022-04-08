@@ -20,16 +20,28 @@ const App = () => {
   ]
    
   const [selected, setSelected] = useState(0)
+  const [votes, setVotes] = useState(new Uint8Array(10))
+
   const setToSelected = (props) => {
     setSelected(props)
+  }
+
+  const setToVotes = () => {
+    const copy = [...votes]
+    copy[selected] += 1
+    setVotes(copy)
   }
 
   return (
     <div>
       <p>
-      {anecdotes[selected]}
+        {anecdotes[selected]}
+      </p>
+      <p>
+        has {votes[selected]} votes
       </p>
       <Button handleClick={() => setToSelected(() => Math.floor(Math.random() * anecdotes.length))} text="next anecdote"/>
+      <Button handleClick={() => setToVotes()} text='vote' />
     </div>
   )
 }
