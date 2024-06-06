@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 const Header = ({header}) => <h1> {header} </h1>
-const StatisticLine = ({text, value}) => <div> {text} {value} </div>
+const StatisticLine = ({text, value}) => <tr><td>{text}</td><td>{value}</td></tr>
 
 const Button = ({handleClick, text}) => {
   return (
@@ -17,24 +17,12 @@ const Statistics = ({good, bad, neutral}) => {
       <div>
         <table>
           <tbody>
-            <tr>
-              <td><StatisticLine text='good' value={good} /></td>
-            </tr>
-            <tr>
-              <td><StatisticLine text='neutral' value={neutral} /></td>
-            </tr>
-            <tr>
-              <td><StatisticLine text='bad' value={bad} /></td>
-            </tr>
-            <tr>
-              <td><StatisticLine text='all' value={good+neutral+bad} /></td>
-            </tr>
-            <tr>
-              <td><StatisticLine text='average' value={(good-bad)/good+neutral+bad} /></td>
-            </tr>
-            <tr>
-              <td><StatisticLine text='positive' value={good/(good+neutral+bad)} /></td>
-            </tr>
+              <StatisticLine text='good' value={good} />
+              <StatisticLine text='neutral' value={neutral} />
+              <StatisticLine text='bad' value={bad} />
+              <StatisticLine text='all' value={good+neutral+bad} />
+              <StatisticLine text='average' value={(good-bad)/good+neutral+bad} />
+              <StatisticLine text='positive' value={good/(good+neutral+bad)} />
           </tbody>
         </table>
       </div>
@@ -53,7 +41,6 @@ const App = () => {
   const [bad, setBad] = useState(0)
 
   const setToGood = newValue => {
-    console.log(newValue)
     setGood(newValue)
   }
 
