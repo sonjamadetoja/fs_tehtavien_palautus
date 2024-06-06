@@ -3,13 +3,11 @@ import { useState } from 'react'
 const Header = ({header}) => <h1> {header} </h1>
 const StatisticLine = ({text, value}) => <tr><td>{text}</td><td>{value}</td></tr>
 
-const Button = ({handleClick, text}) => {
-  return (
+const Button = ({handleClick, text}) => (
   <button onClick={handleClick}>
     {text}
   </button>
   )
-}
 
 const Statistics = ({good, bad, neutral}) => {
   if (good+neutral+bad > 0) {
