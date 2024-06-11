@@ -6,6 +6,33 @@ const Person = ({name, number}) => {
   )
 }
 
+const Filter = ({searchCondition, handleSearchChange}) => {
+  return (
+    <div>filter shown with 
+      <input value={searchCondition} onChange={handleSearchChange}/>
+    </div>
+  )
+}
+
+const Contact = ({addPerson, newName, handleNameChange, newNumber, handleNumberChange}) => {
+  return (
+    <form onSubmit={addPerson}>
+    <div>name: <input value={newName} onChange={handleNameChange}/></div>
+    <div>number: <input value={newNumber} onChange={handleNumberChange}/></div>
+    <div><button type="submit">add</button></div>
+  </form>
+  )
+}
+
+const List = ({peopleToShow}) => {
+  return (
+    <div>
+      {peopleToShow.map(person => 
+      <Person key={person.name} name={person.name} number={person.number} />)}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
@@ -51,20 +78,11 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>filter shown with 
-        <input value={searchCondition} onChange={handleSearchChange}/>
-      </div>
-      <h2>add new</h2>
-      <form onSubmit={addPerson}>
-        <div>nimi: <input value={newName} onChange={handleNameChange}/></div>
-        <div>numero: <input value={newNumber} onChange={handleNumberChange}/></div>
-        <div><button type="submit">add</button></div>
-      </form>
+        <Filter searchCondition={searchCondition} handleSearchChange={handleSearchChange} />
+      <h2>Add new</h2>
+        <Contact addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
       <h2>Numbers</h2>
-      <div>
-        {peopleToShow.map(person => 
-        <Person key={person.name} name={person.name} number={person.number} />)}
-      </div>
+        <List peopleToShow={peopleToShow} />
     </div>
   )
 
