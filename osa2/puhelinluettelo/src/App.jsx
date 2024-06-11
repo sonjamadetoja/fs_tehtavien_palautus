@@ -18,11 +18,16 @@ const App = () => {
 
   const addPerson = (event) => {
     event.preventDefault()
-    const personObject = {
-      name: newName
+    if (persons.some(p => p.name === newName)) {
+      const msg = `${newName} on jo lisätty puhelinluetteloon`
+      alert(msg)
+    } else {
+      const personObject = {
+        name: newName
+      }
+      setPersons(persons.concat(personObject))
+      setNewName('')
     }
-    setPersons(persons.concat(personObject))
-    setNewName('')
   }
 
   return (
