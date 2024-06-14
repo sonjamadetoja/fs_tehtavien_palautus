@@ -50,6 +50,19 @@ const App = () => {
     }
   }
 
+  const removePerson = (id) => {
+    const name = persons.find(person => person.id === id).name
+    if (window.confirm(`Delete ${name}?`)) {
+      contactService
+      .remove(id)
+        .then(deletedPerson => {
+          setPersons(persons.filter(person => {
+            return person.id !== deletedPerson.id
+          }))
+        })
+    }
+  }
+
   const peopleToShow = persons.filter(p => p.name.toLowerCase().includes(searchCondition.trim().toLowerCase()))
 
   return (
@@ -59,7 +72,7 @@ const App = () => {
       <h2>Add new</h2>
         <Contact addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
       <h2>Numbers</h2>
-        <List peopleToShow={peopleToShow} />
+        <List peopleToShow={peopleToShow} removePerson={removePerson} />
     </div>
   )
 

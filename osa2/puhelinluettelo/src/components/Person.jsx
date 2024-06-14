@@ -1,6 +1,13 @@
-const Person = ({name, number}) => {
+
+
+const Person = ({name, number, removePerson}) => {
+    const label = "delete"
+
     return (
-      <p>{name} {number}</p>
+      <p>
+        {name} {number}
+        <button onClick={removePerson}> {label} </button>
+      </p>
     )
   }
 
