@@ -33,8 +33,12 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     if (persons.some(p => p.name === newName)) {
-      const msg = `${newName} on jo lisätty puhelinluetteloon`
-      alert(msg)
+      const replace = window.confirm(`${newName} is already added to phone book. Would you like to replace the old number with a new one?`)
+      if (replace) {
+        const person = persons.find(p => p.name === newName)
+        const changedPerson = {...person, number: newNumber}
+        updatePerson(changedPerson)
+      }
     } else {
       const personObject = {
         name: newName,
@@ -48,6 +52,16 @@ const App = () => {
           setNewNumber('')
         })
     }
+  }
+
+  const updatePerson = (personObject) => {
+    contactService
+    .update(personObject)
+      .then(returnedPerson =>{
+        setPersons(persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
   }
 
   const removePerson = (id) => {
