@@ -2,7 +2,7 @@
   "persons": [
     {
       "name": "Arto Hellas",
-      "number": "040-123456",
+      "number": "040-2325768",
       "id": "1"
     },
     {
@@ -29,6 +29,11 @@
       "id": "2da7",
       "name": "Joseph Jacquard",
       "number": "050-7823486"
+    },
+    {
+      "id": "7052",
+      "name": "Claude Shannon",
+      "number": "040-2327876"
     }
   ]
 }

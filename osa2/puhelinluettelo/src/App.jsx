@@ -9,6 +9,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [searchCondition, setSearchCondition] = useState('')
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     contactService
@@ -28,6 +29,26 @@ const App = () => {
 
   const handleSearchChange = (event) => {
     setSearchCondition(event.target.value)
+  }
+
+  const Notification = ({message}) => {
+    if (message === null) {
+      return null
+    }
+    return (
+      <div className='error' >
+        {message}
+      </div>
+    )
+  }
+
+  const showNotification = (message) =>{
+    setErrorMessage(
+      message
+    )
+    setTimeout(() => {
+      setErrorMessage(null)
+    }, 5000)
   }
 
   const addPerson = (event) => {
@@ -50,6 +71,8 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName('')
           setNewNumber('')
+          const message = `Added ${returnedPerson.name}`
+          showNotification(message)
         })
     }
   }
@@ -61,6 +84,8 @@ const App = () => {
         setPersons(persons.map(person => person.id !== returnedPerson.id ? person : returnedPerson))
         setNewName('')
         setNewNumber('')
+        const message = `Updated ${returnedPerson.name}`
+        showNotification(message)
       })
   }
 
@@ -82,6 +107,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+        <Notification message={errorMessage} />
         <Filter searchCondition={searchCondition} handleSearchChange={handleSearchChange} />
       <h2>Add new</h2>
         <Contact addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
