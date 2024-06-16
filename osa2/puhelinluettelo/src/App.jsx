@@ -10,6 +10,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [searchCondition, setSearchCondition] = useState('')
   const [errorMessage, setErrorMessage] = useState(null)
+  const [color, setColor] = useState("notification")
 
   useEffect(() => {
     contactService
@@ -31,12 +32,19 @@ const App = () => {
     setSearchCondition(event.target.value)
   }
 
-  const Notification = ({message}) => {
+  const Notification = ({message, color}) => {
     if (message === null) {
       return null
     }
+    if (color === "error") {
+      return (
+        <div className='error' >
+          {message}
+        </div>
+      )
+    }
     return (
-      <div className='error' >
+      <div className='notification' >
         {message}
       </div>
     )
@@ -72,6 +80,7 @@ const App = () => {
           setNewName('')
           setNewNumber('')
           const message = `Added ${returnedPerson.name}`
+          setColor("notification")
           showNotification(message)
         })
     }
@@ -85,6 +94,12 @@ const App = () => {
         setNewName('')
         setNewNumber('')
         const message = `Updated ${returnedPerson.name}`
+        setColor("notification")
+        showNotification(message)
+      })
+      .catch(error => {
+        const message = `Information of ${personObject.name} has been removed from server.`
+        setColor("error")
         showNotification(message)
       })
   }
@@ -107,7 +122,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-        <Notification message={errorMessage} />
+        <Notification message={errorMessage} color={color} />
         <Filter searchCondition={searchCondition} handleSearchChange={handleSearchChange} />
       <h2>Add new</h2>
         <Contact addPerson={addPerson} newName={newName} handleNameChange={handleNameChange} newNumber={newNumber} handleNumberChange={handleNumberChange} />
