@@ -83,6 +83,10 @@ const App = () => {
           setColor("notification")
           showNotification(message)
         })
+        .catch(error => {
+          setColor("error")
+          showNotification(error.response.data.error)
+        })
     }
   }
 
