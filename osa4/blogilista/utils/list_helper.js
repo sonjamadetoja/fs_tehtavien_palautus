@@ -51,13 +51,6 @@ const mostBlogs = (blogs) => {
     return result
 }
 
-// _.reduce({ 'a': 1, 'b': 2, 'c': 1 }, function(result, value, key) {
-//     (result[value] || (result[value] = [])).push(key);
-//     return result;
-//   }, {});
-// => { '1': ['a', 'c'], '2': ['b'] } (iteration order is not guaranteed)
-
-
 module.exports = {
   dummy, totalLikes, favoriteBlog, mostBlogs
 }
