@@ -40,7 +40,7 @@ const mostBlogs = (blogs) => {
         return {...acc, [current]: (acc[current] || 0) + 1}
     }, {})
     const authorMostProductive = Object.keys(authors).reduce((a, b) => {
-        return authors[a] > authors[b] 
+        return authors[a] > authors[b]
         ? a
         : b
     }, '')
@@ -51,6 +51,27 @@ const mostBlogs = (blogs) => {
     return result
 }
 
+const mostLikes = (blogs) => {
+    if (blogs.length === 0) {
+        return undefined
+    }
+    const authorMultiplesAndLikes = blogs.map(blog => {author: blog.author; likes: blog.likes})
+    const authors = blogs.reduce((acc, current) => {
+
+        return {...acc, [current.author]: (acc[current.author] || 0) + current.likes}
+    }, {})
+    const authorMostLiked = Object.keys(authors).reduce((a, b) => {
+        return authors[a] > authors[b]
+        ? a
+        : b
+    }, '')
+    const result = {
+        author: authorMostLiked,
+        likes: authors[authorMostLiked]
+      }
+    return result
+}
+
 module.exports = {
-  dummy, totalLikes, favoriteBlog, mostBlogs
+  dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes
 }
