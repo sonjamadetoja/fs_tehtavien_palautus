@@ -111,6 +111,22 @@ test('if \'url\' is empty, respond with \'400 Bad Request\'', async () => {
     assert.strictEqual(response.status, 400)
 })
 
+test('deletion of a blog', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAfterDeletion = await helper.blogsInDb()
+  const titles = blogsAfterDeletion.map(b => b.title)
+
+  assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length - 1)
+  assert(!titles.includes(blogToDelete.title))
+
+})
+
 
 after(async () => {
     await mongoose.connection.close()
