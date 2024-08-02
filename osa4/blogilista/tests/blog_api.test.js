@@ -54,6 +54,32 @@ test('a new blog can be added', async () => {
   assert(blogs.includes('Testi3'))
 })
 
+test('if \'likes\' is empty it is set to zero', async () => {
+  const newBlog = {
+    title: "Testi3",
+    author: "Mina3",
+    url: "www.blogi3.com"
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+    const response = await api.get('/api/blogs')
+    const blogs = response.body
+
+    let likes;
+
+    for (x in blogs) {
+      if (blogs[x].title == "Testi3") {
+        likes = blogs[x].likes
+      }
+    }
+
+    assert.equal(likes, 0)
+})
 
 after(async () => {
     await mongoose.connection.close()
