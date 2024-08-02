@@ -20,13 +20,17 @@ test('blogs are returned as JSON', async () => {
     .expect('Content-Type', /application\/json/)
 })
 
-test('blog identifier is called \'id\'', async () => {
+test.only('blog identifier is called \'id\'', async () => {
   const response = await api.get('/api/blogs')
   const blogs = response.body
-  const hasIds = []
-  blogs.forEach((blog) => {hasIds.push(Object.keys(blog).includes('id'))})
-  const trueArr = new Array(blogs.length).fill(true);
-  assert.deepStrictEqual(hasIds, trueArr)
+  const ids = blogs.map(blog => blog.id)
+  const titles = blogs.map(blog => blog.title)
+
+  const blogPromiseArray = ids.map(id => Blog.findById(id))
+  const newBlogs = await Promise.all(blogPromiseArray)
+  const newTitles = newBlogs.map(blog => blog.title)
+
+  assert.deepStrictEqual(titles, newTitles)
 })
 
 after(async () => {
