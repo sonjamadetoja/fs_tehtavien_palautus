@@ -81,6 +81,37 @@ test('if \'likes\' is empty it is set to zero', async () => {
     assert.equal(likes, 0)
 })
 
+test('if \'title\' is empty, respond with \'400 Bad Request\'', async () => {
+  const newBlog = {
+    author: "Mina3",
+    url: "www.blogi3.com",
+    likes: 300
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+    assert.strictEqual(response.status, 400)
+})
+
+test.only('if \'url\' is empty, respond with \'400 Bad Request\'', async () => {
+  const newBlog = {
+    title: "Testi3",
+    author: "Mina3",
+    likes: 300
+  }
+
+  const response = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(400)
+
+    assert.strictEqual(response.status, 400)
+})
+
+
 after(async () => {
     await mongoose.connection.close()
 })
