@@ -20,7 +20,7 @@ test('blogs are returned as JSON', async () => {
     .expect('Content-Type', /application\/json/)
 })
 
-test.only('blog identifier is called \'id\'', async () => {
+test('blog identifier is called \'id\'', async () => {
   const response = await api.get('/api/blogs')
   const blogs = response.body
   const ids = blogs.map(blog => blog.id)
@@ -31,6 +31,27 @@ test.only('blog identifier is called \'id\'', async () => {
   const newTitles = newBlogs.map(blog => blog.title)
 
   assert.deepStrictEqual(titles, newTitles)
+})
+
+test('a new blog can be added', async () => {
+  const newBlog = {
+    title: "Testi3",
+    author: "Mina3",
+    url: "www.blogi3.com",
+    likes: 300
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  const response = await api.get('/api/blogs')
+  const blogs = response.body.map(b => b.title)
+
+  assert(response.body.length, helper.initialBlogs.length + 1)
+  assert(blogs.includes('Testi3'))
 })
 
 after(async () => {
