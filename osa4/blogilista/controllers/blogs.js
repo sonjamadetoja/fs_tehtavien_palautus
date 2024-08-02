@@ -13,16 +13,17 @@ blogsRouter.post('/', async (request, response) => {
 
   if (!body.title || !body.url) {
     response.status(400).end()
-  } else {
-    const blog = new Blog({
-      title: body.title,
-      author: body.author,
-      url: body.url,
-      likes: body.likes || 0
-    })
-    const savedBlog = await blog.save()
-    response.status(201).json(savedBlog)
   }
+
+  const blog = new Blog({
+    title: body.title,
+    author: body.author,
+    url: body.url,
+    likes: body.likes || 0
+  })
+
+  const savedBlog = await blog.save()
+  response.status(201).json(savedBlog)
 
 })
 

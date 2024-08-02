@@ -96,7 +96,7 @@ test('if \'title\' is empty, respond with \'400 Bad Request\'', async () => {
     assert.strictEqual(response.status, 400)
 })
 
-test.only('if \'url\' is empty, respond with \'400 Bad Request\'', async () => {
+test('if \'url\' is empty, respond with \'400 Bad Request\'', async () => {
   const newBlog = {
     title: "Testi3",
     author: "Mina3",
