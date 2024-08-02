@@ -50,9 +50,10 @@ test('a new blog can be added', async () => {
   const response = await api.get('/api/blogs')
   const blogs = response.body.map(b => b.title)
 
-  assert(response.body.length, helper.initialBlogs.length + 1)
+  assert.equal(response.body.length, helper.initialBlogs.length + 1)
   assert(blogs.includes('Testi3'))
 })
+
 
 after(async () => {
     await mongoose.connection.close()
