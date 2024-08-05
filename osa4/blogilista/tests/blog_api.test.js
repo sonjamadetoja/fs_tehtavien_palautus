@@ -6,7 +6,6 @@ const app = require('../app')
 const api = supertest(app)
 const helper = require('./test_helper')
 const Blog = require('../models/blog')
-const { config } = require('dotenv')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
@@ -125,6 +124,28 @@ test('deletion of a blog', async () => {
   assert.strictEqual(blogsAfterDeletion.length, blogsAtStart.length - 1)
   assert(!titles.includes(blogToDelete.title))
 
+})
+
+test('changing a blog', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToChange = blogsAtStart[0]
+
+  const newBlog = {
+    title: blogToChange.title,
+    author: blogToChange.author,
+    url: blogToChange.url,
+    likes: blogToChange.likes + 1
+  }
+
+  await api
+    .put(`/api/blogs/${blogToChange.id}`)
+    .send(newBlog)
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+  const upDatedBlog = await Blog.findById(blogToChange.id)
+
+  assert.strictEqual(upDatedBlog.likes, blogToChange.likes + 1)
 })
 
 
