@@ -12,6 +12,7 @@ const App = () => {
   const [newTitle, setNewTitle] = useState('')
   const [newAuthor, setNewAuthor] = useState('')
   const [newUrl, setNewUrl] = useState('')
+  const [notificationMessage, setNotificationMessage] = useState(null)
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -24,6 +25,7 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       setUser(user)
+      blogService.setToken(user.token)
     }
   }, [])
 
@@ -35,17 +37,29 @@ const App = () => {
       window.localStorage.setItem('loggedInBlogUser', JSON.stringify(user))
 
       blogService.setToken(user.token)
+
       setUser(user)
       setUsername('')
       setPassword('')
+      setNotificationMessage("You logged in successfully.")
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     } catch (exception) {
-      console.log('exception', exception)
+      setNotificationMessage("Login failed. Wrong password or username.")
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     }
   }
 
   const handleLogout = () => {
     setUser(null)
     window.localStorage.removeItem('loggedInBlogUser')
+    setNotificationMessage("You logged out successfully.")
+    setTimeout(() => {
+      setNotificationMessage(null)
+    }, 5000)
   }
 
   const addBlog = async (event) => {
@@ -58,13 +72,20 @@ const App = () => {
     }
 
     try {
-      const returnedNote = await blogService.create(blogObject)
-      setBlogs(blogs.concat(returnedNote))
+      const returnedBlog = await blogService.create(blogObject)
+      setBlogs(blogs.concat(returnedBlog))
       setNewTitle('')
       setNewAuthor('')
       setNewUrl('')
+      setNotificationMessage(`You successfully added blog ${blogObject.title}`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     } catch (exception) {
-      console.log('exception', exception)
+      setNotificationMessage(`Adding a blog failed. Please fill in all required fields properly.`)
+      setTimeout(() => {
+        setNotificationMessage(null)
+      }, 5000)
     }
   }
 
@@ -79,9 +100,22 @@ const App = () => {
     </div>
   )
 
+  const Notification = ({message}) => {
+    if (message === null) {
+      return null
+    }
+
+    return (
+      <div className='notification'>
+        {message}
+      </div>
+    )
+  }
+
   if (user === null) {
     return (
       <div>
+        <Notification message={notificationMessage} />
         <LoginForm handleLogin={handleLogin} 
         username={username} setUsername={setUsername} 
         password={password} setPassword={setPassword} />
@@ -91,6 +125,7 @@ const App = () => {
 
   return (
     <div>
+      <Notification message={notificationMessage} />
       {user.name} is logged in. <button onClick={handleLogout}>logout</button>
       <h2>create new</h2>
         <div>
