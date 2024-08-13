@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Blog from './components/Blog'
-import LoginForm from './components/Login'
+import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
+import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
@@ -9,10 +11,9 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [newTitle, setNewTitle] = useState('')
-  const [newAuthor, setNewAuthor] = useState('')
-  const [newUrl, setNewUrl] = useState('')
   const [notificationMessage, setNotificationMessage] = useState(null)
+
+  const blogFormRef = useRef()
 
   useEffect(() => {
     blogService.getAll().then(blogs =>
@@ -62,43 +63,36 @@ const App = () => {
     }, 5000)
   }
 
-  const addBlog = async (event) => {
-    event.preventDefault()
-
-    const blogObject = {
-      title: newTitle,
-      author: newAuthor,
-      url: newUrl
-    }
-
+  const addBlog = async (blogObject) => {
     try {
+      blogFormRef.current.toggleVisibility()
       const returnedBlog = await blogService.create(blogObject)
       setBlogs(blogs.concat(returnedBlog))
-      setNewTitle('')
-      setNewAuthor('')
-      setNewUrl('')
       setNotificationMessage(`You successfully added blog ${blogObject.title}`)
       setTimeout(() => {
         setNotificationMessage(null)
       }, 5000)
     } catch (exception) {
-      setNotificationMessage(`Adding a blog failed. Please fill in all required fields properly.`)
+      if (exception.response.data.error.includes('token expired')) {
+        setNotificationMessage('Your session has expired. Please log in again.')
+      } else {
+        setNotificationMessage(`Adding a blog failed. Please fill in all required fields properly.`)
+      }
       setTimeout(() => {
         setNotificationMessage(null)
       }, 5000)
     }
   }
 
-  const blogForm = () => (
-    <div>
-      <form onSubmit={addBlog}>
-        title: <input type='text' value={newTitle} name='title' onChange={({ target }) => {setNewTitle(target.value)}} />
-        author: <input type='text' value={newAuthor} name='author' onChange={({ target }) => {setNewAuthor(target.value)}} />
-        url: <input type='text' value={newUrl} name='url' onChange={({ target }) => {setNewUrl(target.value)}} />
-        <button type='submit'>save</button>
-      </form>
-    </div>
-  )
+  const blogForm = () => {
+    return (
+      <div>
+        <Togglable buttonLabel="create new blog" ref={blogFormRef}>
+          <BlogForm addBlog={addBlog} />
+        </Togglable>
+      </div>
+    )
+  }
 
   const Notification = ({message}) => {
     if (message === null) {
@@ -127,7 +121,6 @@ const App = () => {
     <div>
       <Notification message={notificationMessage} />
       {user.name} is logged in. <button onClick={handleLogout}>logout</button>
-      <h2>create new</h2>
         <div>
           {blogForm()}
         </div>
