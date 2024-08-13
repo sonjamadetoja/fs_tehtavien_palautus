@@ -8,6 +8,7 @@ const Blog = ({ blog, increaseLikes }) => {
     borderWidth: 2,
     marginBottom: 5
   }
+
   const [detailVisibility, setDetailVisibility] = useState(false)
 
   const hideWhenDetailsVisible = { display: detailVisibility ? 'none' : '' }

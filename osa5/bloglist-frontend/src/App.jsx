@@ -84,10 +84,11 @@ const App = () => {
     }
   }
 
-  const updateBlog = async (blogObject) => {
+  const updateBlog = async (changedBlog, user) => {
     try {
-      const returnedBlog = await blogService.update(blogObject)
-      const updatedBlogs = blogs.map(blog => blog.id === returnedBlog.id ? returnedBlog : blog)
+      const returnedBlog = await blogService.update(changedBlog)
+      const updatedReturnedBlog = {...returnedBlog, user: user}
+      const updatedBlogs = blogs.map(blog => blog.id === updatedReturnedBlog.id ? updatedReturnedBlog : blog)
       setBlogs(updatedBlogs)
     } catch (exception) {
       console.log('An error occurred. ', exception)
@@ -97,7 +98,7 @@ const App = () => {
   const increaseLikes = async (blogId) => {
     const blog = blogs.find(blog => blog.id === blogId)
     const changedBlog = {...blog, likes: blog.likes+1, user: blog.user.id}
-    await updateBlog(changedBlog)
+    await updateBlog(changedBlog, blog.user)
   }
 
   const blogForm = () => {
