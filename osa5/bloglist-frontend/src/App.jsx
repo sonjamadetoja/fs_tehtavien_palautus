@@ -18,7 +18,7 @@ const App = () => {
   useEffect(() => {
     blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+    )
   }, [])
 
   useEffect(() => {
@@ -142,7 +142,7 @@ const App = () => {
           {blogForm()}
         </div>
       <h2>blogs</h2>
-      {blogs.map(blog =>
+      {blogs.sort((a, b) => (b.likes - a.likes)).map(blog =>
         <Blog key={blog.id} blog={blog} increaseLikes={increaseLikes} />
       )}
     </div>
