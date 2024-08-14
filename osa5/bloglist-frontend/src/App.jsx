@@ -42,12 +42,12 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      setNotificationMessage("You logged in successfully.")
+      setNotificationMessage('You logged in successfully.')
       setTimeout(() => {
         setNotificationMessage(null)
       }, 5000)
     } catch (exception) {
-      setNotificationMessage("Login failed. Wrong password or username.")
+      setNotificationMessage('Login failed. Wrong password or username.')
       setTimeout(() => {
         setNotificationMessage(null)
       }, 5000)
@@ -57,7 +57,7 @@ const App = () => {
   const handleLogout = () => {
     setUser(null)
     window.localStorage.removeItem('loggedInBlogUser')
-    setNotificationMessage("You logged out successfully.")
+    setNotificationMessage('You logged out successfully.')
     setTimeout(() => {
       setNotificationMessage(null)
     }, 5000)
@@ -76,7 +76,7 @@ const App = () => {
       if (exception.response.data.error.includes('token expired')) {
         setNotificationMessage('Your session has expired. Please log in again.')
       } else {
-        setNotificationMessage(`Adding a blog failed. Please fill in all required fields properly.`)
+        setNotificationMessage('Adding a blog failed. Please fill in all required fields properly.')
       }
       setTimeout(() => {
         setNotificationMessage(null)
@@ -87,7 +87,7 @@ const App = () => {
   const updateBlog = async (changedBlog, user) => {
     try {
       const returnedBlog = await blogService.update(changedBlog)
-      const updatedReturnedBlog = {...returnedBlog, user: user}
+      const updatedReturnedBlog = { ...returnedBlog, user: user }
       const updatedBlogs = blogs.map(blog => blog.id === updatedReturnedBlog.id ? updatedReturnedBlog : blog)
       setBlogs(updatedBlogs)
     } catch (exception) {
@@ -97,15 +97,15 @@ const App = () => {
 
   const increaseLikes = async (blogId) => {
     const blog = blogs.find(blog => blog.id === blogId)
-    const changedBlog = {...blog, likes: blog.likes+1, user: blog.user.id}
+    const changedBlog = { ...blog, likes: blog.likes+1, user: blog.user.id }
     await updateBlog(changedBlog, blog.user)
   }
 
   const handleRemove = async (blogId) => {
     try {
-    await blogService.remove(blogId)
-    const updatedBlogs = blogs.filter(blog => blog.id !== blogId )
-    setBlogs(updatedBlogs)
+      await blogService.remove(blogId)
+      const updatedBlogs = blogs.filter(blog => blog.id !== blogId )
+      setBlogs(updatedBlogs)
     } catch (exception) {
       console.log('An error occurred. ', exception)
     }
@@ -121,7 +121,7 @@ const App = () => {
     )
   }
 
-  const Notification = ({message}) => {
+  const Notification = ({ message }) => {
     if (message === null) {
       return null
     }
@@ -137,20 +137,20 @@ const App = () => {
     return (
       <div>
         <Notification message={notificationMessage} />
-        <LoginForm handleLogin={handleLogin} 
-        username={username} setUsername={setUsername} 
-        password={password} setPassword={setPassword} />
+        <LoginForm handleLogin={handleLogin}
+          username={username} setUsername={setUsername}
+          password={password} setPassword={setPassword} />
       </div>
     )
-  } 
+  }
 
   return (
     <div>
       <Notification message={notificationMessage} />
       {user.name} is logged in. <button onClick={handleLogout}>logout</button>
-        <div>
-          {blogForm()}
-        </div>
+      <div>
+        {blogForm()}
+      </div>
       <h2>blogs</h2>
       {blogs.sort((a, b) => (b.likes - a.likes)).map(blog =>
         <Blog key={blog.id} blog={blog} increaseLikes={increaseLikes} handleRemove={handleRemove} user={user}/>
