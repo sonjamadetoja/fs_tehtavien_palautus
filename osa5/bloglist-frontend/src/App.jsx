@@ -101,6 +101,16 @@ const App = () => {
     await updateBlog(changedBlog, blog.user)
   }
 
+  const handleRemove = async (blogId) => {
+    try {
+    await blogService.remove(blogId)
+    const updatedBlogs = blogs.filter(blog => blog.id !== blogId )
+    setBlogs(updatedBlogs)
+    } catch (exception) {
+      console.log('An error occurred. ', exception)
+    }
+  }
+
   const blogForm = () => {
     return (
       <div>
@@ -143,7 +153,7 @@ const App = () => {
         </div>
       <h2>blogs</h2>
       {blogs.sort((a, b) => (b.likes - a.likes)).map(blog =>
-        <Blog key={blog.id} blog={blog} increaseLikes={increaseLikes} />
+        <Blog key={blog.id} blog={blog} increaseLikes={increaseLikes} handleRemove={handleRemove}/>
       )}
     </div>
   )
