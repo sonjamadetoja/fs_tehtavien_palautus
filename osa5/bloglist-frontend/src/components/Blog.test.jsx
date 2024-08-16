@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import Blog from './Blog'
+import { expect } from 'vitest'
 
 const testBlog = {
   title: 'Test Blog Name',
@@ -12,11 +13,13 @@ const testBlog = {
 
 const testUser = { username: 'testuser' }
 
+const mockHandler = vi.fn()
+
 let container
 
 beforeEach(() => {
   container = render(
-    <Blog blog={testBlog} user={testUser} />
+    <Blog blog={testBlog} increaseLikes={mockHandler} user={testUser} />
   ).container
 })
 
@@ -37,4 +40,14 @@ test('clicking the view-button shows url, likes and user', async () => {
 
   const div = container.querySelector('.togglableDetails')
   expect(div).not.toHaveStyle('display: none')
+})
+
+test('clicking the like button twice alls the event handler twice', async () => {
+  const user = userEvent.setup()
+  const button = screen.getByText('like')
+
+  await user.click(button)
+  await user.click(button)
+
+  expect(mockHandler.mock.calls).toHaveLength(2)
 })
