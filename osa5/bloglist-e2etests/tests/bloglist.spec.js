@@ -1,13 +1,13 @@
 
 const { test, expect, beforeEach, describe } = require('@playwright/test')
-import { loginWith } from './helper'
+import { loginWith, addNewBlog } from './helper'
 
 const username = 'mluukkai'
 const password = 'salainen'
 
 describe('Bloglist', () => {
   beforeEach(async ({ page, request}) => {
-    const response = await request.post('http://localhost:3003/api/testing/reset')
+    await request.post('http://localhost:3003/api/testing/reset')
     await request.post('http://localhost:3003/api/users', {
       data: {
         name: 'Matti Luukkainen',
@@ -68,11 +68,7 @@ describe('Bloglist', () => {
       await loginWith(page, username, password)
     })
     test('a new blog can be created', async ({ page }) => {
-      await page.getByRole('button', { name: 'create new blog'}).click()
-      await page.getByTestId('title').fill('Do Dolphins Give Each Other… Names?')
-      await page.getByTestId('author').fill('Arik Kershenbaum')
-      await page.getByTestId('url').fill('https://lithub.com/do-dolphins-give-each-other-names/')
-      await page.getByRole('button', { name: 'save'}).click()
+      await addNewBlog(page, 'Do Dolphins Give Each Other… Names?', 'Arik Kershenbaum', 'https://lithub.com/do-dolphins-give-each-other-names/')
 
       const notificationDiv = await page.locator('.notification')
       await expect(notificationDiv).toContainText('You successfully added blog Do Dolphins Give Each Other… Names?')
@@ -80,6 +76,20 @@ describe('Bloglist', () => {
       const blogDiv = await page.locator('div', { hasText: 'Do Dolphins Give Each Other… Names?', hasNotText: 'You successfully added blog'})
       await expect(blogDiv).toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
 
+    })
+
+    describe('And a blog has been added', () => {
+      beforeEach(async ({ page }) => {
+        await addNewBlog(page, 'Do Dolphins Give Each Other… Names?', 'Arik Kershenbaum', 'https://lithub.com/do-dolphins-give-each-other-names/')
+      })
+
+      test('Blog can be liked', async ({ page }) => {
+        await page.getByRole('button', { name: 'view' }).click()
+        const detailDiv = await page.locator('.togglableDetails')
+        await expect(detailDiv).toContainText('likes 0')
+        await page.getByRole('button', { name: 'like' }).click()
+        await expect(detailDiv).toContainText('likes 1')
+      })
     })
   })
 })
