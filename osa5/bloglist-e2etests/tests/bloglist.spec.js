@@ -29,7 +29,7 @@ describe('Bloglist', () => {
     await locatorUsernameBox.waitFor()
     await locatorPasswordBox.waitFor()
     await locatorLoginButton.waitFor()
-    
+
     expect(locatorPageTitle).toBeVisible()
     expect(locatorUsernameBox).toBeVisible()
     expect(locatorPasswordBox).toBeVisible()
@@ -60,6 +60,26 @@ describe('Bloglist', () => {
       await expect(notificationDiv).toHaveCSS('border-style', 'solid')
 
       await expect(page.getByText('Matti Luukkainen is logged in.')).not.toBeVisible()
+    })
+  })
+
+  describe('When logged in', () => {
+    beforeEach(async ({ page }) => {
+      await loginWith(page, username, password)
+    })
+    test('a new blog can be created', async ({ page }) => {
+      await page.getByRole('button', { name: 'create new blog'}).click()
+      await page.getByTestId('title').fill('Do Dolphins Give Each Other… Names?')
+      await page.getByTestId('author').fill('Arik Kershenbaum')
+      await page.getByTestId('url').fill('https://lithub.com/do-dolphins-give-each-other-names/')
+      await page.getByRole('button', { name: 'save'}).click()
+
+      const notificationDiv = await page.locator('.notification')
+      await expect(notificationDiv).toContainText('You successfully added blog Do Dolphins Give Each Other… Names?')
+
+      const blogDiv = await page.locator('div', { hasText: 'Do Dolphins Give Each Other… Names?', hasNotText: 'You successfully added blog'})
+      await expect(blogDiv).toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
+
     })
   })
 })
