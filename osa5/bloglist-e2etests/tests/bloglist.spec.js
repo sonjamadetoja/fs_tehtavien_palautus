@@ -73,7 +73,7 @@ describe('Bloglist', () => {
       const notificationDiv = await page.locator('.notification')
       await expect(notificationDiv).toContainText('You successfully added blog Do Dolphins Give Each Other… Names?')
 
-      const blogDiv = await page.locator('div', { hasText: 'Do Dolphins Give Each Other… Names?', hasNotText: 'You successfully added blog'})
+      const blogDiv = await page.locator('.blogInfo')
       await expect(blogDiv).toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
 
     })
@@ -89,6 +89,15 @@ describe('Bloglist', () => {
         await expect(detailDiv).toContainText('likes 0')
         await page.getByRole('button', { name: 'like' }).click()
         await expect(detailDiv).toContainText('likes 1')
+      })
+
+      test.only('Blog can be removed by user who added it',  async ({ page }) => {
+        const blogDiv = await page.locator('.loggedIn')
+        await expect(blogDiv).toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
+        await page.getByRole('button', { name: 'view' }).click()
+        await page.on('dialog', dialog => dialog.accept())
+        await page.getByRole('button', { name: 'remove' }).click()
+        await expect(blogDiv).not.toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
       })
     })
   })

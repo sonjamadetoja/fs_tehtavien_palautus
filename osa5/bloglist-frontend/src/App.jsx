@@ -145,7 +145,7 @@ const App = () => {
   }
 
   return (
-    <div>
+    <div className='loggedIn'>
       <Notification message={notificationMessage} />
       {user.name} is logged in. <button onClick={handleLogout}>logout</button>
       <div>
