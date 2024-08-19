@@ -1,5 +1,9 @@
 
 const { test, expect, beforeEach, describe } = require('@playwright/test')
+import { loginWith } from './helper'
+
+const username = 'mluukkai'
+const password = 'salainen'
 
 describe('Bloglist', () => {
   beforeEach(async ({ page, request}) => {
@@ -7,8 +11,8 @@ describe('Bloglist', () => {
     await request.post('http://localhost:3003/api/users', {
       data: {
         name: 'Matti Luukkainen',
-        username: 'mluukkai',
-        password: 'salainen'
+        username: username,
+        password: password
       }
     })
 
@@ -22,6 +26,10 @@ describe('Bloglist', () => {
     const locatorLoginButton = await page.getByRole('button', { name: 'login' })
 
     await locatorPageTitle.waitFor()
+    await locatorUsernameBox.waitFor()
+    await locatorPasswordBox.waitFor()
+    await locatorLoginButton.waitFor()
+    
     expect(locatorPageTitle).toBeVisible()
     expect(locatorUsernameBox).toBeVisible()
     expect(locatorPasswordBox).toBeVisible()
@@ -30,16 +38,12 @@ describe('Bloglist', () => {
 
   describe('Login', () => {
     test('succeeds with correct credentials', async ({ page }) => {
-      await page.getByTestId('username').fill('mluukkai')
-      await page.getByTestId('password').fill('salainen')
-      await page.getByRole('button', { name: 'login' }).click()
+      await loginWith(page, username, password)
       await expect(page.getByText('Matti Luukkainen is logged in.')).toBeVisible()
     })
 
-    test.only('fails with wrong username', async ({ page }) => {
-      await page.getByTestId('username').fill('mluu')
-      await page.getByTestId('password').fill('salainen')
-      await page.getByRole('button', { name: 'login' }).click()
+    test('fails with wrong username', async ({ page }) => {
+      await loginWith(page, 'mluu', password)
 
       const notificationDiv = await page.locator('.notification')
       await expect(notificationDiv).toContainText('Login failed. Wrong password or username.')
@@ -48,10 +52,8 @@ describe('Bloglist', () => {
       await expect(page.getByText('Matti Luukkainen is logged in.')).not.toBeVisible()
     })
 
-    test.only('fails with wrong password', async ({ page }) => {
-      await page.getByTestId('username').fill('mluukkai')
-      await page.getByTestId('password').fill('salai')
-      await page.getByRole('button', { name: 'login' }).click()
+    test('fails with wrong password', async ({ page }) => {
+      await loginWith(page, username, 'salai')
 
       const notificationDiv = await page.locator('.notification')
       await expect(notificationDiv).toContainText('Login failed. Wrong password or username.')
@@ -60,5 +62,4 @@ describe('Bloglist', () => {
       await expect(page.getByText('Matti Luukkainen is logged in.')).not.toBeVisible()
     })
   })
-
 })
