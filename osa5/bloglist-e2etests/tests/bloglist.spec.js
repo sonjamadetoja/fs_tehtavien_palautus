@@ -27,4 +27,38 @@ describe('Bloglist', () => {
     expect(locatorPasswordBox).toBeVisible()
     expect(locatorLoginButton).toBeVisible()
   })
+
+  describe('Login', () => {
+    test('succeeds with correct credentials', async ({ page }) => {
+      await page.getByTestId('username').fill('mluukkai')
+      await page.getByTestId('password').fill('salainen')
+      await page.getByRole('button', { name: 'login' }).click()
+      await expect(page.getByText('Matti Luukkainen is logged in.')).toBeVisible()
+    })
+
+    test.only('fails with wrong username', async ({ page }) => {
+      await page.getByTestId('username').fill('mluu')
+      await page.getByTestId('password').fill('salainen')
+      await page.getByRole('button', { name: 'login' }).click()
+
+      const notificationDiv = await page.locator('.notification')
+      await expect(notificationDiv).toContainText('Login failed. Wrong password or username.')
+      await expect(notificationDiv).toHaveCSS('border-style', 'solid')
+
+      await expect(page.getByText('Matti Luukkainen is logged in.')).not.toBeVisible()
+    })
+
+    test.only('fails with wrong password', async ({ page }) => {
+      await page.getByTestId('username').fill('mluukkai')
+      await page.getByTestId('password').fill('salai')
+      await page.getByRole('button', { name: 'login' }).click()
+
+      const notificationDiv = await page.locator('.notification')
+      await expect(notificationDiv).toContainText('Login failed. Wrong password or username.')
+      await expect(notificationDiv).toHaveCSS('border-style', 'solid')
+
+      await expect(page.getByText('Matti Luukkainen is logged in.')).not.toBeVisible()
+    })
+  })
+
 })
