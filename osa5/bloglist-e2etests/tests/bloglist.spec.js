@@ -91,13 +91,29 @@ describe('Bloglist', () => {
         await expect(detailDiv).toContainText('likes 1')
       })
 
-      test.only('Blog can be removed by user who added it',  async ({ page }) => {
+      test('Blog can be removed by user who added it',  async ({ page }) => {
         const blogDiv = await page.locator('.loggedIn')
         await expect(blogDiv).toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
         await page.getByRole('button', { name: 'view' }).click()
         await page.on('dialog', dialog => dialog.accept())
         await page.getByRole('button', { name: 'remove' }).click()
         await expect(blogDiv).not.toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
+      })
+
+      test('Remove button not visible to other users',  async ({ page, request }) => {
+        await request.post('http://localhost:3003/api/users', {
+          data: {
+            name: 'Another User',
+            username: 'another',
+            password: 'another'
+          }
+        })
+        await page.getByRole('button', { name: 'logout' }).click()
+        await loginWith(page, 'another', 'another')
+        const blogDiv = await page.locator('.loggedIn')
+        await expect(blogDiv).toContainText('Do Dolphins Give Each Other… Names? Arik Kershenbaum')
+        await page.getByRole('button', { name: 'view' }).click()
+        await expect(page.getByRole('button', { name: 'remove' })).not.toBeVisible()
       })
     })
   })
