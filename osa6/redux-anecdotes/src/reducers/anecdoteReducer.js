@@ -9,14 +9,6 @@ const anecdotesAtStart = [
 
 const getId = () => (100000 * Math.random()).toFixed(0)
 
-export const createAnecdote = (anecdote) => {
-  const asObj = asObject(anecdote)
-  return {
-    type: 'NEW_ANECDOTE',
-    payload: asObj
-  }
-}
-
 const asObject = (anecdote) => {
   return {
     content: anecdote,
@@ -43,11 +35,18 @@ const reducer = (state = initialState, action) => {
   }
 }
 
-
 export const increaseVotes = (id) => {
   return {
     type: 'INCREASE',
     payload: { id }
+  }
+}
+
+export const createAnecdote = (anecdote) => {
+  const asObj = asObject(anecdote)
+  return {
+    type: 'NEW_ANECDOTE',
+    payload: asObj
   }
 }
 
