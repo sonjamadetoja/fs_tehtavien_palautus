@@ -34,12 +34,9 @@ export const useNotificationDispatch = () => {
   return notificationAndDispatch[1]
 }
 
-// export const resetNotification = (dispatch, message, seconds) => {
-//   return dispatch => {
-//     console.log('resetNotification')
-//     dispatch({type: 'setNotification', payload: message})
-//     setTimeout(() => {dispatch({type: 'removeNotification'}), seconds*1000})
-//   }
-// }
+export const resetNotification = (dispatch, message) => {
+  dispatch({type: 'setNotification', payload: message})
+  setTimeout(() => dispatch({ type: 'removeNotification' }), 5000)
+}
 
 export default NotificationContext
