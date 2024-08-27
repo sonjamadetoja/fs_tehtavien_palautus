@@ -20,7 +20,7 @@ const App = () => {
     updateAnecdoteMutation.mutate({...anecdote, votes: anecdote.votes + 1})
     const message = `You voted for: ${anecdote.content}`
     dispatch({type: 'setNotification', payload: message})
-    setTimeout(() => {dispatch({type: 'removeNotification'}), 5000})
+    setTimeout(() => dispatch({ type: 'removeNotification' }), 5000);
   }
 
   const result = useQuery({

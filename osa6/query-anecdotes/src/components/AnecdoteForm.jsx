@@ -13,7 +13,7 @@ const AnecdoteForm = () => {
     onError: (error) => {
       const message = error.response.data.error
       dispatch({type: 'setNotification', payload: message})
-      setTimeout(() => {dispatch({type: 'removeNotification'}), 5000})
+      setTimeout(() => dispatch({type: 'removeNotification'}), 5000)
     }
   })
 
@@ -24,7 +24,7 @@ const AnecdoteForm = () => {
     newAnecdoteMutation.mutate({ content, votes: 0})
     const message = `new anecdote created: ${content}`
     dispatch({type: 'setNotification', payload: message})
-    setTimeout(() => {dispatch({type: 'removeNotification'}), 5000})
+    setTimeout(() => dispatch({ type: 'removeNotification' }), 5000)
   }
 
   return (
