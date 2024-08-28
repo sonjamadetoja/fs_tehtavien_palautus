@@ -69,19 +69,20 @@ const CreateNew = (props) => {
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (e.target.name === 'create'){
-      props.addNew({
-        content: content.value,
-        author: author.value,
-        info: info.value,
-        votes: 0
-      })
-      navigate('/')
-    } else if (e.target.name === 'reset') {
-      content.reset()
-      author.reset()
-      info.reset()
-    }
+    props.addNew({
+      content: content.value,
+      author: author.value,
+      info: info.value,
+      votes: 0
+    })
+    navigate('/')
+  }
+
+  const handleReset = (e) => {
+    e.preventDefault()
+    content.reset()
+    author.reset()
+    info.reset()
   }
 
   return (
@@ -100,8 +101,8 @@ const CreateNew = (props) => {
           url for more info
           <input {...info} />
         </div>
-        <button type='submit' name='create'>create</button>
-        <button type='button' name='reset' onClick={handleSubmit} >reset</button>
+        <button type='submit'>create</button>
+        <button type='button' onClick={handleReset} >reset</button>
       </form>
     </div>
   )
