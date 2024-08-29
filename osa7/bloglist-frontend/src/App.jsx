@@ -2,18 +2,23 @@ import { useState, useEffect, useRef } from 'react';
 import Blog from './components/Blog';
 import LoginForm from './components/LoginForm';
 import BlogForm from './components/BlogForm';
+import Notification from './components/Notification';
 import Togglable from './components/Togglable';
 import blogService from './services/blogs';
 import loginService from './services/login';
+import {
+  useNotificationDispatch,
+  showNotification
+} from './NotificationContext';
 
 const App = () => {
   const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
-  const [notificationMessage, setNotificationMessage] = useState(null);
 
   const blogFormRef = useRef();
+  const dispatch = useNotificationDispatch();
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs));
@@ -40,25 +45,16 @@ const App = () => {
       setUser(user);
       setUsername('');
       setPassword('');
-      setNotificationMessage('You logged in successfully.');
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
+      showNotification(dispatch, 'You logged in successfully.');
     } catch (exception) {
-      setNotificationMessage('Login failed. Wrong password or username.');
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
+      showNotification(dispatch, 'Login failed. Wrong password or username.');
     }
   };
 
   const handleLogout = () => {
     setUser(null);
     window.localStorage.removeItem('loggedInBlogUser');
-    setNotificationMessage('You logged out successfully.');
-    setTimeout(() => {
-      setNotificationMessage(null);
-    }, 5000);
+      showNotification(dispatch, 'You logged out successfully.');
   };
 
   const addBlog = async (blogObject) => {
@@ -66,23 +62,17 @@ const App = () => {
       blogFormRef.current.toggleVisibility();
       const returnedBlog = await blogService.create(blogObject);
       setBlogs(blogs.concat(returnedBlog));
-      setNotificationMessage(`You successfully added blog ${blogObject.title}`);
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
+      showNotification(dispatch, `You successfully added blog ${blogObject.title}`);
     } catch (exception) {
       if (exception.response.data.error.includes('token expired')) {
-        setNotificationMessage(
+        showNotification(dispatch, 
           'Your session has expired. Please log in again.',
         );
       } else {
-        setNotificationMessage(
-          'Adding a blog failed. Please fill in all required fields properly.',
+        showNotification(dispatch, 
+          'Adding a blog failed. Please fill in all required fields properly.'
         );
       }
-      setTimeout(() => {
-        setNotificationMessage(null);
-      }, 5000);
     }
   };
 
@@ -125,18 +115,10 @@ const App = () => {
     );
   };
 
-  const Notification = ({ message }) => {
-    if (message === null) {
-      return null;
-    }
-
-    return <div className="notification">{message}</div>;
-  };
-
   if (user === null) {
     return (
       <div>
-        <Notification message={notificationMessage} />
+        <Notification />
         <LoginForm
           handleLogin={handleLogin}
           username={username}
@@ -150,7 +132,7 @@ const App = () => {
 
   return (
     <div className="loggedIn">
-      <Notification message={notificationMessage} />
+      <Notification />
       {user.name} is logged in. <button onClick={handleLogout}>logout</button>
       <div>{blogForm()}</div>
       <h2>blogs</h2>
