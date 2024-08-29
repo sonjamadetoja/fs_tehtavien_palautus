@@ -19,6 +19,7 @@ const App = () => {
 
   const blogFormRef = useRef();
   const dispatch = useNotificationDispatch();
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInBlogUser');
@@ -29,7 +30,6 @@ const App = () => {
     }
   }, []);
 
-  const queryClient = useQueryClient()
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
     onSuccess: (newBlog) => {
@@ -49,6 +49,27 @@ const App = () => {
     }
   })
 
+  const updateBlogMutation = useMutation({
+    mutationFn: blogService.update,
+    onSuccess: (changedBlog, user) => {
+      queryClient.invalidateQueries({ queryKey: ['blogs']})
+      queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.map((blog) => blog.id === changedBlog.id ? { ...changedBlog, user: user } : blog))
+    },
+    onError: (error) => {
+      console.log('An error occurred. ', error);
+    }
+  })
+
+  const removeBlogMutation = useMutation({
+    mutationFn: blogService.remove,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['blogs']})
+    },
+    onError: (error) => {
+      console.log('An error occurred. ', error);
+    }
+  })
+
   const result = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
@@ -63,40 +84,20 @@ const App = () => {
 
   const blogs = result.data
 
-
-  const addBlog = async (blogObject) => {
+  const addBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility();
     newBlogMutation.mutate(blogObject)
     showNotification(dispatch, `You successfully added blog ${blogObject.title}`);
   };
 
-  const updateBlog = async (changedBlog, user) => {
-    try {
-      const returnedBlog = await blogService.update(changedBlog);
-      const updatedReturnedBlog = { ...returnedBlog, user: user };
-      const updatedBlogs = blogs.map((blog) =>
-        blog.id === updatedReturnedBlog.id ? updatedReturnedBlog : blog,
-      );
-      setBlogs(updatedBlogs);
-    } catch (exception) {
-      console.log('An error occurred. ', exception);
-    }
-  };
-
-  const increaseLikes = async (blogId) => {
+  const increaseLikes = (blogId) => {
     const blog = blogs.find((blog) => blog.id === blogId);
     const changedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id };
-    await updateBlog(changedBlog, blog.user);
+    updateBlogMutation.mutate(changedBlog, blog.user)
   };
 
-  const handleRemove = async (blogId) => {
-    try {
-      await blogService.remove(blogId);
-      const updatedBlogs = blogs.filter((blog) => blog.id !== blogId);
-      setBlogs(updatedBlogs);
-    } catch (exception) {
-      console.log('An error occurred. ', exception);
-    }
+  const handleRemove = (blogId) => {
+    removeBlogMutation.mutate(blogId)
   };
 
   const handleLogin = async (event) => {
