@@ -10,19 +10,15 @@ import {
   useNotificationDispatch,
   showNotification
 } from './NotificationContext';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 
 const App = () => {
-  const [blogs, setBlogs] = useState([]);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [user, setUser] = useState(null);
 
   const blogFormRef = useRef();
   const dispatch = useNotificationDispatch();
-
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs));
-  }, []);
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInBlogUser');
@@ -33,38 +29,15 @@ const App = () => {
     }
   }, []);
 
-  const handleLogin = async (event) => {
-    event.preventDefault();
-    try {
-      const user = await loginService.login({ username, password });
-
-      window.localStorage.setItem('loggedInBlogUser', JSON.stringify(user));
-
-      blogService.setToken(user.token);
-
-      setUser(user);
-      setUsername('');
-      setPassword('');
-      showNotification(dispatch, 'You logged in successfully.');
-    } catch (exception) {
-      showNotification(dispatch, 'Login failed. Wrong password or username.');
-    }
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    window.localStorage.removeItem('loggedInBlogUser');
-      showNotification(dispatch, 'You logged out successfully.');
-  };
-
-  const addBlog = async (blogObject) => {
-    try {
-      blogFormRef.current.toggleVisibility();
-      const returnedBlog = await blogService.create(blogObject);
-      setBlogs(blogs.concat(returnedBlog));
-      showNotification(dispatch, `You successfully added blog ${blogObject.title}`);
-    } catch (exception) {
-      if (exception.response.data.error.includes('token expired')) {
+  const queryClient = useQueryClient()
+  const newBlogMutation = useMutation({
+    mutationFn: blogService.create,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] })
+      queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.concat(newBlog))
+    },
+    onError: (error) => {
+      if (error.response.data.error.includes('token expired')) {
         showNotification(dispatch, 
           'Your session has expired. Please log in again.',
         );
@@ -74,6 +47,27 @@ const App = () => {
         );
       }
     }
+  })
+
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: blogService.getAll,
+    refetchOnWindowFocus: false
+  })
+
+  console.log(JSON.parse(JSON.stringify(result)))
+
+  if (result.isLoading) {
+    return <div>Loading data...</div>
+  }
+
+  const blogs = result.data
+
+
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility();
+    newBlogMutation.mutate(blogObject)
+    showNotification(dispatch, `You successfully added blog ${blogObject.title}`);
   };
 
   const updateBlog = async (changedBlog, user) => {
@@ -103,6 +97,30 @@ const App = () => {
     } catch (exception) {
       console.log('An error occurred. ', exception);
     }
+  };
+
+  const handleLogin = async (event) => {
+    event.preventDefault();
+    try {
+      const user = await loginService.login({ username, password });
+
+      window.localStorage.setItem('loggedInBlogUser', JSON.stringify(user));
+
+      blogService.setToken(user.token);
+
+      setUser(user);
+      setUsername('');
+      setPassword('');
+      showNotification(dispatch, 'You logged in successfully.');
+    } catch (exception) {
+      showNotification(dispatch, 'Login failed. Wrong password or username.');
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    window.localStorage.removeItem('loggedInBlogUser');
+      showNotification(dispatch, 'You logged out successfully.');
   };
 
   const blogForm = () => {
