@@ -10,94 +10,104 @@ import {
   useNotificationDispatch,
   showNotification
 } from './NotificationContext';
+import { useAuthValue, useAuthDispatch } from './AuthContext';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 
 const App = () => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [user, setUser] = useState(null);
-
   const blogFormRef = useRef();
   const dispatch = useNotificationDispatch();
-  const queryClient = useQueryClient()
+  const queryClient = useQueryClient();
+  const authDispatch = useAuthDispatch();
+  const authValue = useAuthValue();
+  const password = authValue.password;
+  const username = authValue.username;
+  const user = authValue.user;
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedInBlogUser');
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON);
-      setUser(user);
-      blogService.setToken(user.token);
+      authDispatch({ type: 'SET_USER', payload: user });
+      blogService.setToken(user.token)
     }
-  }, []);
+  }, [authDispatch]);
 
   const newBlogMutation = useMutation({
     mutationFn: blogService.create,
     onSuccess: (newBlog) => {
-      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] })
-      queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.concat(newBlog))
+      const blogs = queryClient.getQueryData({ queryKey: ['blogs'] });
+      queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.concat(newBlog));
     },
     onError: (error) => {
       if (error.response.data.error.includes('token expired')) {
-        showNotification(dispatch, 
+        showNotification(
+          dispatch,
           'Your session has expired. Please log in again.',
         );
       } else {
-        showNotification(dispatch, 
-          'Adding a blog failed. Please fill in all required fields properly.'
+        showNotification(
+          dispatch,
+          'Adding a blog failed. Please fill in all required fields properly.',
         );
       }
-    }
-  })
+    },
+  });
 
   const updateBlogMutation = useMutation({
     mutationFn: blogService.update,
     onSuccess: (changedBlog, user) => {
-      queryClient.invalidateQueries({ queryKey: ['blogs']})
-      queryClient.setQueryData({ queryKey: ['blogs'] }, blogs.map((blog) => blog.id === changedBlog.id ? { ...changedBlog, user: user } : blog))
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
+      queryClient.setQueryData(
+        { queryKey: ['blogs'] },
+        blogs.map((blog) =>
+          blog.id === changedBlog.id ? { ...changedBlog, user: user } : blog,
+        ),
+      );
     },
     onError: (error) => {
       console.log('An error occurred. ', error);
-    }
-  })
+    },
+  });
 
   const removeBlogMutation = useMutation({
     mutationFn: blogService.remove,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['blogs']})
+      queryClient.invalidateQueries({ queryKey: ['blogs'] });
     },
     onError: (error) => {
       console.log('An error occurred. ', error);
-    }
-  })
+    },
+  });
 
   const result = useQuery({
     queryKey: ['blogs'],
     queryFn: blogService.getAll,
-    refetchOnWindowFocus: false
-  })
-
-  console.log(JSON.parse(JSON.stringify(result)))
+    refetchOnWindowFocus: false,
+  });
 
   if (result.isLoading) {
-    return <div>Loading data...</div>
+    return <div>Loading data...</div>;
   }
 
-  const blogs = result.data
+  const blogs = result.data;
 
   const addBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility();
-    newBlogMutation.mutate(blogObject)
-    showNotification(dispatch, `You successfully added blog ${blogObject.title}`);
+    newBlogMutation.mutate(blogObject);
+    showNotification(
+      dispatch,
+      `You successfully added blog ${blogObject.title}`,
+    );
   };
 
   const increaseLikes = (blogId) => {
     const blog = blogs.find((blog) => blog.id === blogId);
     const changedBlog = { ...blog, likes: blog.likes + 1, user: blog.user.id };
-    updateBlogMutation.mutate(changedBlog, blog.user)
+    updateBlogMutation.mutate(changedBlog, blog.user);
   };
 
   const handleRemove = (blogId) => {
-    removeBlogMutation.mutate(blogId)
+    removeBlogMutation.mutate(blogId);
   };
 
   const handleLogin = async (event) => {
@@ -106,12 +116,12 @@ const App = () => {
       const user = await loginService.login({ username, password });
 
       window.localStorage.setItem('loggedInBlogUser', JSON.stringify(user));
+      
+      blogService.setToken(user.token)
 
-      blogService.setToken(user.token);
-
-      setUser(user);
-      setUsername('');
-      setPassword('');
+      authDispatch({ type: 'SET_USER', payload: user });
+      authDispatch({ type: 'SET_USERNAME', payload: '' });
+      authDispatch({ type: 'SET_PASSWORD', payload: '' });
       showNotification(dispatch, 'You logged in successfully.');
     } catch (exception) {
       showNotification(dispatch, 'Login failed. Wrong password or username.');
@@ -119,9 +129,9 @@ const App = () => {
   };
 
   const handleLogout = () => {
-    setUser(null);
+    authDispatch({ type: 'LOGOUT' });
     window.localStorage.removeItem('loggedInBlogUser');
-      showNotification(dispatch, 'You logged out successfully.');
+    showNotification(dispatch, 'You logged out successfully.');
   };
 
   const blogForm = () => {
@@ -138,13 +148,7 @@ const App = () => {
     return (
       <div>
         <Notification />
-        <LoginForm
-          handleLogin={handleLogin}
-          username={username}
-          setUsername={setUsername}
-          password={password}
-          setPassword={setPassword}
-        />
+        <LoginForm handleLogin={handleLogin} />
       </div>
     );
   }

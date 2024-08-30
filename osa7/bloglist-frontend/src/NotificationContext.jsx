@@ -34,6 +34,6 @@ export const useNotificationDispatch = () => {
 export const showNotification = (dispatch, message) => {
   dispatch({ type: 'SET', payload: message });
   setTimeout(() => dispatch({ type: 'RESET' }), 5 * 1000);
-}
+};
 
 export default NotificationContext;

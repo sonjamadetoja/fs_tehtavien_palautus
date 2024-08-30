@@ -1,12 +1,11 @@
 import PropTypes from 'prop-types';
+import { useAuthValue, useAuthDispatch } from '../AuthContext';
 
-const LoginForm = ({
-  handleLogin,
-  username,
-  setUsername,
-  password,
-  setPassword,
-}) => {
+const LoginForm = ({ handleLogin }) => {
+  const authDispatch = useAuthDispatch();
+  const authValue = useAuthValue();
+  const password = authValue.password;
+  const username = authValue.username;
   return (
     <div>
       <h2>Log in to application</h2>
@@ -18,7 +17,9 @@ const LoginForm = ({
             type="text"
             value={username}
             name="Username"
-            onChange={({ target }) => setUsername(target.value)}
+            onChange={({ target }) =>
+              authDispatch({ type: 'SET_USERNAME', payload: target.value })
+            }
           />
         </div>
         <div>
@@ -28,7 +29,9 @@ const LoginForm = ({
             type="text"
             value={password}
             name="Password"
-            onChange={({ target }) => setPassword(target.value)}
+            onChange={({ target }) =>
+              authDispatch({ type: 'SET_PASSWORD', payload: target.value })
+            }
           />
         </div>
         <button type="submit">login</button>
@@ -38,11 +41,7 @@ const LoginForm = ({
 };
 
 LoginForm.propTypes = {
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
   handleLogin: PropTypes.func.isRequired,
-  setUsername: PropTypes.func.isRequired,
-  setPassword: PropTypes.func.isRequired,
 };
 
 export default LoginForm;
